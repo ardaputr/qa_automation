@@ -9,8 +9,8 @@ test.describe('Skenario 1: Mengelola Karyawan (Data-Driven)', () => {
   
   test.beforeEach(async ({ page }) => {
     const loginPage = new LoginPage(page);
-    await loginPage.goto(); // Asumsi Anda menggunakan goto() di LoginPage
-    await loginPage.doLogin('bosavi1271@datoinf.com', 'n8t3A785EYfmjL@'); // Asumsi menggunakan doLogin()
+    await loginPage.goto();
+    await loginPage.doLogin('bosavi1271@datoinf.com', 'n8t3A785EYfmjL@');
     await expect(page).not.toHaveURL(/login/);
   });
 
@@ -24,11 +24,10 @@ test.describe('Skenario 1: Mengelola Karyawan (Data-Driven)', () => {
       // 2. Isi data langkah 1 menggunakan data dari JSON 
       await employeePage.fillStep1(employee);
 
-      // 3. Submit (Perhatikan: tidak ada argumen employee di dalam kurung)
+      // 3. Submit
       await employeePage.fillStep2();
 
       // 4. Verifikasi (Assertion) bahwa karyawan berhasil ditambah
-      // Menunggu notifikasi muncul
       await expect(page.getByText(/success/i).first()).toBeVisible({ timeout: 15000 });
     });
   }

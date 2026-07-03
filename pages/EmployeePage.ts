@@ -15,10 +15,10 @@ export class EmployeePage {
     await addActionBtn.click();
 
     const addSingleBtn = this.page.getByTestId('btn-add-single');
-    await expect(addSingleBtn).toBeVisible({ timeout: 15000 }); // tunggu dropdown/menu muncul dulu
+    await expect(addSingleBtn).toBeVisible({ timeout: 15000 });
     await addSingleBtn.click();
 
-    await expect(this.page.getByRole('heading', { name: 'Add Employee' })).toBeVisible({ timeout: 15000 }); // pastikan sudah pindah halaman
+    await expect(this.page.getByRole('heading', { name: 'Add Employee' })).toBeVisible({ timeout: 15000 });
     await expect(this.page.getByRole('textbox', { name: 'Full Name' })).toBeVisible({ timeout: 15000 });
   }
 
@@ -101,21 +101,15 @@ export class EmployeePage {
     // await this.page.locator('#rc_select_11').click();
     // await this.page.getByRole('button', { name: data.benefitName, exact: true }).click();
 
-    // [PERBAIKAN JOKOWI]: Ganti klik dinamis rc_select dengan locator yang lebih pasti (klik area select-nya langsung)
     await this.page.locator('div')
       .filter({ hasText: /^Additional Benefits \(optional\)/ })
       .locator('.ant-select-selector')
       .first()
       .click();
-
-    // Hapus baris ini: await this.page.locator('#rc_select_11').click();
     
     await this.page.getByRole('button', { name: data.benefitName, exact: true }).click();
-
-    // Pastikan dropdown Benefit Name benar-benar tertutup sebelum lanjut,
-    // supaya tidak menutupi/menghalangi tombol Save
     await this.page.keyboard.press('Escape');
-    await this.page.getByText('Add New Benefit').click(); // klik area netral di modal untuk memastikan fokus lepas dari dropdown
+    await this.page.getByText('Add New Benefit').click();
 
     const benefitAmountInput = this.page.getByRole('spinbutton', { name: '0' }).last();
     await benefitAmountInput.click();
@@ -141,12 +135,9 @@ export class EmployeePage {
     await expect(submitBtn).toBeEnabled({ timeout: 15000 }); 
     await submitBtn.click();
 
-    // Hapus waitForTimeout statis. 
-    // Ganti dengan menunggu elemen sukses (misalnya toast) secara dinamis agar tidak kena limit 30 detik.
     try {
       await this.page.waitForSelector('.ant-message-notice, .toast, [role="alert"]', { state: 'visible', timeout: 3000 });
     } catch (e) {
-      // Abaikan jika toast tidak muncul cepat, test tetap berlanjut dan PASSED
     }
   }
 }
