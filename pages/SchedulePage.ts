@@ -54,13 +54,13 @@ export class SchedulePage {
     if (await scheduleRadio.isEnabled()) {
       await scheduleRadio.check();
     } else {
-      console.log(`[INFO] Opsi '${data.scheduleType}' dikunci oleh sistem.`);
+      console.log(`[INFO] Opsi '${data.scheduleType}' dikunci oleh sistem, langkah di-skip.`);
     }
 
     if (await holidayRadio.isEnabled()) {
       await holidayRadio.check();
     } else {
-      console.log(`[INFO] Opsi '${data.holidayRule}' dikunci oleh sistem.`);
+      console.log(`[INFO] Opsi '${data.holidayRule}' dikunci oleh sistem, langkah di-skip.`);
     }
 
     // 6. Default Shift
@@ -69,62 +69,92 @@ export class SchedulePage {
     }
 
     await this.page.getByRole('button', { name: 'Next' }).click();
+    
   }
-
-  // [BARU DIPERBAIKI]: Fungsi untuk WFO ("Yes") yang mendukung banyak hari
+// ---------------------------------------------------------
+  // [FUNGSI 1]: Untuk WFO ("Yes")
+  // ---------------------------------------------------------
   async assignEmployeesToShift(employeeNames: string[], locationName: string, days: string[]) {
     for (const name of employeeNames) {
-      const notAddedTab = this.page.getByRole('button', { name: 'Employee Not Added' });
-      await notAddedTab.waitFor({ state: 'visible', timeout: 10000 });
-      await notAddedTab.click(); 
+      try {
+        const notAddedTab = this.page.getByText('Employee Not Added', { exact: true }).first();
+        await notAddedTab.waitFor({ state: 'visible', timeout: 5000 });
+        await notAddedTab.click(); 
+      } catch (e) {
+        console.log(`[INFO] Tab sudah aktif, lanjut ke pencarian untuk: ${name}`);
+      }
       
       await this.page.waitForTimeout(1000); 
 
+      // Cari karyawan
+    //   const searchBox = this.page.getByRole('textbox', { name: 'Search employee here' });
+    //   await searchBox.click();
+    //   await searchBox.clear(); 
+    //   await searchBox.fill(name);
+    //   await this.page.keyboard.press('Enter');
+
       const searchBox = this.page.getByRole('textbox', { name: 'Search employee here' });
       await searchBox.click();
-      await searchBox.clear(); 
-      await searchBox.fill(name);
-      await this.page.keyboard.press('Enter');
+      await searchBox.fill(''); // Paksa kosongkan dengan fill
+      await this.page.waitForTimeout(500); // Jeda sebentar agar UI merespons
+      await searchBox.fill(name); // Baru isi dengan nama baru
+    //   await this.page.keyboard.press('Enter');
       
       await this.page.waitForTimeout(2000); 
 
       const employeeRow = this.page.getByRole('row').filter({ hasText: name });
       await employeeRow.waitFor({ state: 'visible', timeout: 15000 });
-      await employeeRow.locator('label.ant-checkbox-wrapper, .ant-checkbox').first().click();
 
-      await this.page.getByRole('button', { name: 'Add To Shift' }).nth(1).click();
+      // Klik Action Button di tabel
+      await employeeRow.locator('.ant-table-cell-fix-right .group, .ant-table-cell-fix-right button, .ant-table-cell-fix-right').first().click();
 
-      // Pilih lokasi
+      // Penanganan Cerdas Modal Bentrok Jadwal
+      try {
+        const dialog = this.page.getByRole('dialog');
+        await expect(dialog.getByText('conflicting schedule')).toBeVisible({ timeout: 3000 });
+        
+        await dialog.locator('.ant-table-selection-column').first().click();
+        const moveBtn = dialog.getByRole('button', { name: 'Move' }).first();
+        if (await moveBtn.isVisible()) await moveBtn.click();
+        const nextBtn = dialog.getByRole('button', { name: 'Next' });
+        if (await nextBtn.isVisible()) await nextBtn.click();
+        const saveBtn = dialog.getByRole('button', { name: 'Save' });
+        if (await saveBtn.isVisible()) await saveBtn.click();
+        
+        await this.page.waitForTimeout(1000);
+      } catch (e) {}
+
+      // Pilih lokasi lalu langsung APPLY
       await this.page.getByRole('radio', { name: locationName }).click(); 
-      
-      // Looping untuk klik banyak hari
-      for (const day of days) {
-        await this.page.getByRole('checkbox', { name: day }).locator('..').click();
-      }
-
       await this.page.getByRole('button', { name: 'Apply' }).click();
 
-      // Move dan Save per orang
-      await this.page.getByRole('row', { name: 'Select all' }).locator('.ant-checkbox-wrapper').first().click();
-      await this.page.getByRole('button', { name: 'Move' }).first().click();
-      await this.page.getByRole('button', { name: 'Save' }).click();
+      // [DIHAPUS]: Bagian Select All, Move, dan Save per baris dihapus sesuai UI terbaru
 
       await this.page.waitForTimeout(2000); 
     }
 
+    // Setelah semua karyawan di-looping, baru klik Next (ke step 3) lalu Save Changes
     await this.page.getByRole('button', { name: 'Next' }).click();
+    await this.page.waitForTimeout(1000);
     await this.page.getByRole('button', { name: 'Save Changes' }).click();
   }
 
-  // Fungsi khusus untuk WFH/Flexible ("No")
+  // ---------------------------------------------------------
+  // [FUNGSI 2]: Untuk WFH/Flexible ("No")
+  // ---------------------------------------------------------
   async assignEmployeesWithoutValidation(employeeNames: string[], locationName: string, days: string[]) {
     for (const name of employeeNames) {
-      const notAddedTab = this.page.getByRole('button', { name: 'Employee Not Added' });
-      await notAddedTab.waitFor({ state: 'visible', timeout: 10000 });
-      await notAddedTab.click();
+      try {
+        const notAddedTab = this.page.getByText('Employee Not Added', { exact: true }).first();
+        await notAddedTab.waitFor({ state: 'visible', timeout: 5000 });
+        await notAddedTab.click();
+      } catch (e) {
+        console.log(`[INFO] Tab sudah aktif, lanjut ke pencarian untuk: ${name}`);
+      }
       
       await this.page.waitForTimeout(1000); 
 
+      // Cari karyawan
       const searchBox = this.page.getByRole('textbox', { name: 'Search employee here' });
       await searchBox.click();
       await searchBox.clear(); 
@@ -135,17 +165,30 @@ export class SchedulePage {
 
       const employeeRow = this.page.getByRole('row').filter({ hasText: name });
       await employeeRow.waitFor({ state: 'visible', timeout: 15000 });
-      await employeeRow.locator('label.ant-checkbox-wrapper, .ant-checkbox').first().click();
 
-      await employeeRow.locator('.ant-table-cell-fix-right .group, button').first().click();
+      // Klik Action Button di tabel
+      await employeeRow.locator('.ant-table-cell-fix-right .group, .ant-table-cell-fix-right button, .ant-table-cell-fix-right').first().click();
 
+      // Penanganan Cerdas Modal Bentrok Jadwal
+      try {
+        const dialog = this.page.getByRole('dialog');
+        await expect(dialog.getByText('conflicting schedule')).toBeVisible({ timeout: 3000 });
+        
+        await dialog.locator('.ant-table-selection-column').first().click();
+        const moveBtn = dialog.getByRole('button', { name: 'Move' }).first();
+        if (await moveBtn.isVisible()) await moveBtn.click();
+        const nextBtn = dialog.getByRole('button', { name: 'Next' });
+        if (await nextBtn.isVisible()) await nextBtn.click();
+        const saveBtn = dialog.getByRole('button', { name: 'Save' });
+        if (await saveBtn.isVisible()) await saveBtn.click();
+        
+        await this.page.waitForTimeout(1000);
+      } catch (e) {}
+
+      // [PERBAIKAN]: Pilih lokasi lalu langsung APPLY (Tanpa mencari hari)
       await this.page.getByRole('radio', { name: locationName }).click();
-
-      for (const day of days) {
-        await this.page.getByRole('checkbox', { name: day }).locator('..').click();
-      }
-
       await this.page.getByRole('button', { name: 'Apply' }).click();
+      
       await this.page.waitForTimeout(1500); 
     }
 

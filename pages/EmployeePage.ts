@@ -78,23 +78,35 @@ export class EmployeePage {
     await this.page.getByRole('combobox', { name: 'Employee Tax Status' }).click();
     await this.page.getByRole('option', { name: data.employeeTaxStatus }).click();
 
-    await this.page.getByRole('combobox', { name: 'Payment Schedule' }).click();
+    // await this.page.getByRole('combobox', { name: 'Payment Schedule' }).click();
+    // await this.page.getByRole('option', { name: data.paymentSchedule }).click();
+
+    // await this.page.getByRole('spinbutton', { name: 'Salary' }).click();
+    // await this.page.getByRole('spinbutton', { name: 'Salary' }).fill(data.salary);
+
+    await this.page.getByRole('combobox', { name: 'Payment Schedule' }).click({ force: true });
     await this.page.getByRole('option', { name: data.paymentSchedule }).click();
 
     await this.page.getByRole('spinbutton', { name: 'Salary' }).click();
     await this.page.getByRole('spinbutton', { name: 'Salary' }).fill(data.salary);
+
+    await this.page.locator('#salaryBasis').click({ force: true });
+    
+    const salaryBasisOption = this.page.locator('.ant-select-item-option-content').getByText(data.salaryBasis, { exact: true }).filter({ visible: true });
+    await salaryBasisOption.waitFor({ state: 'visible', timeout: 15000 });
+    await salaryBasisOption.click();
 
     // await this.page.locator('#salaryBasis').click();
     // const salaryBasisOption = this.page.getByText(data.salaryBasis, { exact: true }).filter({ visible: true });
     // await salaryBasisOption.waitFor({ state: 'visible', timeout: 15000 });
     // await salaryBasisOption.click();
 
-    await this.page.locator('#salaryBasis').click();
+    // await this.page.locator('#salaryBasis').click();
     
-    // [PERBAIKAN SITI]: Tambahkan locator class khusus option agar tidak menabrak label teks
-    const salaryBasisOption = this.page.locator('.ant-select-item-option-content').getByText(data.salaryBasis, { exact: true }).filter({ visible: true });
-        await salaryBasisOption.waitFor({ state: 'visible', timeout: 15000 });
-    await salaryBasisOption.click();
+    // // [PERBAIKAN SITI]: Tambahkan locator class khusus option agar tidak menabrak label teks
+    // const salaryBasisOption = this.page.locator('.ant-select-item-option-content').getByText(data.salaryBasis, { exact: true }).filter({ visible: true });
+    //     await salaryBasisOption.waitFor({ state: 'visible', timeout: 15000 });
+    // await salaryBasisOption.click();
 
     // Additional Benefits
     // await this.page.locator('div').filter({ hasText: /^Additional Benefits \(optional\)e\.g\. Tunjangan Pulsa$/ }).nth(1).click();

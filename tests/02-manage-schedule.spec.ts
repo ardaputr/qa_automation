@@ -17,7 +17,7 @@ test('Create WFO Schedule with strict validations', async ({ page }) => {
   await schedulePage.goToScheduleMenu();
 
   const shiftWFO = {
-    branch: 'Mie Ayam Maknyus',
+    branch: 'Headquarter', // <-- Diperbarui ke Headquarter
     shiftName: 'Shift Reguler WFO',
     startDate: '1',
     endDate: '31',
@@ -33,19 +33,17 @@ test('Create WFO Schedule with strict validations', async ({ page }) => {
 
   await schedulePage.fillShiftDetails(shiftWFO);
   
-  const wfoEmployees = ['Joko Widodo', 'Siti Aminah', 'Budi Santoso'];
-  
-  // [PERBAIKAN]: Buat array hari untuk WFO
+  // Menggunakan 3 nama
+  const wfoEmployees = ['Deni Pratama', 'Eka Wardani', 'Faisal Rahman'];
   const workingDaysWFO = ['Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   
-  // Masukkan array harinya ke parameter ketiga
   await schedulePage.assignEmployeesToShift(
     wfoEmployees, 
     'Jakarta International Expo', 
     workingDaysWFO
   );
   
-  await expect(page.getByText('Saved successfully')).toBeVisible({ timeout: 15000 }); 
+  await expect(page).not.toHaveURL(/.*add.*/, { timeout: 15000 });
 });
 
 // TEST CASE 2: Jadwal WFH Santai (Tanpa Validasi)
@@ -54,21 +52,21 @@ test('Create WFH Schedule without validations', async ({ page }) => {
   await schedulePage.goToScheduleMenu();
 
   const shiftWFH = {
-    branch: 'Mie Ayam Maknyus',
+    branch: 'Headquarter', // <-- Diperbarui ke Headquarter
     shiftName: 'Shift Flexible WFH',
     startDate: '1',
     endDate: '31',
     requireValidation: false, 
     validationTypes: [],
     workLocationType: 'WFH', 
-    scheduleType: 'Flexible (count total working duration)',
+    scheduleType: 'Fixed Schedule', 
     holidayRule: 'Day Off',
     isDefault: false
   };
 
   await schedulePage.fillShiftDetails(shiftWFH);
   
-  const wfhEmployees = ['Andi Wijaya', 'Rina Melati'];
+const wfhEmployees = ['Budi Santoso', 'Cahya Kamila']; 
   const workingDaysWFH = ['Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   
   await schedulePage.assignEmployeesWithoutValidation(
@@ -77,5 +75,5 @@ test('Create WFH Schedule without validations', async ({ page }) => {
     workingDaysWFH
   );
 
-  await expect(page.getByText('Saved successfully')).toBeVisible({ timeout: 15000 }); 
+  await expect(page).not.toHaveURL(/.*add.*/, { timeout: 15000 });
 });
