@@ -71,9 +71,7 @@ export class SchedulePage {
     await this.page.getByRole('button', { name: 'Next' }).click();
     
   }
-// ---------------------------------------------------------
   // [FUNGSI 1]: Untuk WFO ("Yes")
-  // ---------------------------------------------------------
   async assignEmployeesToShift(employeeNames: string[], locationName: string, days: string[]) {
     for (const name of employeeNames) {
       try {
@@ -95,9 +93,9 @@ export class SchedulePage {
 
       const searchBox = this.page.getByRole('textbox', { name: 'Search employee here' });
       await searchBox.click();
-      await searchBox.fill(''); // Paksa kosongkan dengan fill
-      await this.page.waitForTimeout(500); // Jeda sebentar agar UI merespons
-      await searchBox.fill(name); // Baru isi dengan nama baru
+      await searchBox.fill('');
+      await this.page.waitForTimeout(500);
+      await searchBox.fill(name); 
     //   await this.page.keyboard.press('Enter');
       
       await this.page.waitForTimeout(2000); 
@@ -108,7 +106,7 @@ export class SchedulePage {
       // Klik Action Button di tabel
       await employeeRow.locator('.ant-table-cell-fix-right .group, .ant-table-cell-fix-right button, .ant-table-cell-fix-right').first().click();
 
-      // Penanganan Cerdas Modal Bentrok Jadwal
+
       try {
         const dialog = this.page.getByRole('dialog');
         await expect(dialog.getByText('conflicting schedule')).toBeVisible({ timeout: 3000 });
@@ -127,9 +125,6 @@ export class SchedulePage {
       // Pilih lokasi lalu langsung APPLY
       await this.page.getByRole('radio', { name: locationName }).click(); 
       await this.page.getByRole('button', { name: 'Apply' }).click();
-
-      // [DIHAPUS]: Bagian Select All, Move, dan Save per baris dihapus sesuai UI terbaru
-
       await this.page.waitForTimeout(2000); 
     }
 
@@ -139,9 +134,7 @@ export class SchedulePage {
     await this.page.getByRole('button', { name: 'Save Changes' }).click();
   }
 
-  // ---------------------------------------------------------
   // [FUNGSI 2]: Untuk WFH/Flexible ("No")
-  // ---------------------------------------------------------
   async assignEmployeesWithoutValidation(employeeNames: string[], locationName: string, days: string[]) {
     for (const name of employeeNames) {
       try {
@@ -184,8 +177,7 @@ export class SchedulePage {
         
         await this.page.waitForTimeout(1000);
       } catch (e) {}
-
-      // [PERBAIKAN]: Pilih lokasi lalu langsung APPLY (Tanpa mencari hari)
+      
       await this.page.getByRole('radio', { name: locationName }).click();
       await this.page.getByRole('button', { name: 'Apply' }).click();
       

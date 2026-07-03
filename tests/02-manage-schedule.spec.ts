@@ -17,7 +17,7 @@ test('Create WFO Schedule with strict validations', async ({ page }) => {
   await schedulePage.goToScheduleMenu();
 
   const shiftWFO = {
-    branch: 'Headquarter', // <-- Diperbarui ke Headquarter
+    branch: 'Headquarter',
     shiftName: 'Shift Reguler WFO',
     startDate: '1',
     endDate: '31',
@@ -33,7 +33,6 @@ test('Create WFO Schedule with strict validations', async ({ page }) => {
 
   await schedulePage.fillShiftDetails(shiftWFO);
   
-  // Menggunakan 3 nama
   const wfoEmployees = ['Deni Pratama', 'Eka Wardani', 'Faisal Rahman'];
   const workingDaysWFO = ['Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   
@@ -52,7 +51,7 @@ test('Create WFH Schedule without validations', async ({ page }) => {
   await schedulePage.goToScheduleMenu();
 
   const shiftWFH = {
-    branch: 'Headquarter', // <-- Diperbarui ke Headquarter
+    branch: 'Headquarter',
     shiftName: 'Shift Flexible WFH',
     startDate: '1',
     endDate: '31',

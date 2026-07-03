@@ -103,7 +103,6 @@ export class EmployeePage {
 
     // await this.page.locator('#salaryBasis').click();
     
-    // // [PERBAIKAN SITI]: Tambahkan locator class khusus option agar tidak menabrak label teks
     // const salaryBasisOption = this.page.locator('.ant-select-item-option-content').getByText(data.salaryBasis, { exact: true }).filter({ visible: true });
     //     await salaryBasisOption.waitFor({ state: 'visible', timeout: 15000 });
     // await salaryBasisOption.click();
