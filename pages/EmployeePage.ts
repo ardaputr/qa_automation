@@ -22,10 +22,9 @@ export class EmployeePage {
     await this.page.getByRole('textbox', { name: 'Full Name' }).click();
     await this.page.getByRole('textbox', { name: 'Full Name' }).fill(data.fullName);
     await this.page.getByRole('textbox', { name: 'Full Name' }).press('Tab');
-    
-    await this.page.getByRole('textbox', { name: 'Employment ID' }).fill('');
+
     await this.page.getByRole('textbox', { name: 'Employment ID' }).fill(data.employmentId);
-    
+
     await this.page.getByRole('textbox', { name: 'Company Email' }).click();
     await this.page.getByRole('textbox', { name: 'Company Email' }).fill(data.companyEmail);
 
@@ -33,7 +32,7 @@ export class EmployeePage {
     // DIRECT MANAGER & PHONE
     // ===============================
     await this.page.getByRole('combobox', { name: 'Direct Manager' }).click();
-    await this.page.getByText(data.directManager, { exact: true }).click(); 
+    await this.page.getByText(data.directManager, { exact: true }).click();
 
     await this.page.getByRole('spinbutton', { name: 'Mobile Phone (WhatsApp)' }).click();
     await this.page.getByRole('spinbutton', { name: 'Mobile Phone (WhatsApp)' }).fill(data.mobilePhone);
@@ -105,14 +104,14 @@ export class EmployeePage {
     await this.page.getByRole('spinbutton', { name: 'Salary' }).fill(data.salary);
 
     await this.page.locator('#salaryBasis').click();
-    await this.page.getByText(data.salaryBasis, { exact: true }).nth(1).click(); 
+    await this.page.getByText(data.salaryBasis, { exact: true }).nth(1).click();
 
     // ===============================
     // ADDITIONAL BENEFITS
     // ===============================
     await this.page.locator('div').filter({ hasText: /^Additional Benefits \(optional\)e\.g\. Tunjangan Pulsa$/ }).nth(1).click();
     await this.page.waitForTimeout(500); // Jeda agar animasi popup benefit terbuka
-    await this.page.getByRole('button', { name: data.benefitName }).click();
+    await this.page.getByRole('button', { name: data.benefitName, exact: true }).click();
 
     // Menggunakan .last() untuk memastikan kolom input terfokus
     const benefitAmountInput = this.page.getByRole('spinbutton', { name: '0' }).last();
@@ -125,7 +124,7 @@ export class EmployeePage {
     // TAXABILITY
     // ===============================
     await this.page.getByRole('combobox', { name: 'Taxability' }).click();
-    await this.page.getByText(data.taxability).nth(1).click();
+    await this.page.getByText(data.taxability, { exact: true }).nth(1).click();
   }
 
   async fillStep2() {
