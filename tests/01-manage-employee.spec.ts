@@ -3,6 +3,8 @@ import { LoginPage } from '../pages/LoginPage';
 import { EmployeePage } from '../pages/EmployeePage';
 import employeesData from '../data/employees.json';
 
+test.setTimeout(60000);
+
 test.describe('Skenario 1: Mengelola Karyawan (Data-Driven)', () => {
   
   test.beforeEach(async ({ page }) => {
